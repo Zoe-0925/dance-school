@@ -1,0 +1,5 @@
+{
+    "appService.preDeployTask": "publish-release",
+    "appService.deploySubpath": "danceschool/bin/Release/net5.0/publish",
+    "appService.defaultWebAppToDeploy": "/subscriptions/b3c659ac-475e-4673-b012-146296fb33a3/resourceGroups/danceschool/providers/Microsoft.Web/sites/danceschool-app"
+}
