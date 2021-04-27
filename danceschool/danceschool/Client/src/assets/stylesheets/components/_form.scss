@@ -1,0 +1,111 @@
+@import "abstracts/variables";
+
+
+@media (min-width: 416px) {
+  .form {
+    margin-left: auto;
+    margin-right: auto;
+    width: 20rem;
+  }
+
+  .auth-form{
+    margin-left: auto;
+    margin-right: auto;
+    width: 25rem;
+  }
+}
+
+@media (min-width: 416px) {
+
+  .time {
+    color: rgb(107, 119, 140);
+    padding-top: 0.125rem;
+    white-space: nowrap;
+    margin-top: 0;
+    font-size: 0.75rem;
+    line-height: 1.33333;
+  }
+}
+
+.form {
+  width: fullscreen;
+
+  padding: 0px;
+
+  @media (max-width: 415px) {
+    margin-left: 3rem;
+    margin-right: 3rem;
+
+    .navbar-create-btn {
+      width: 50%;
+    }
+  }
+
+  .navbar-create-btn {
+    @include call-to-action-button;
+  }
+}
+
+.field-container {
+  width: 100%;
+
+  .label {
+    width: 100%;
+    font-weight: bold;
+    font-size: 1em;
+    font-style: roboto;
+    letter-spacing: -0.003em;
+    margin-top: 1rem;
+    line-height: 1.5rem;
+    color: rgb(23, 43, 77);
+    overflow-wrap: break-word;
+    text-align: left;
+    padding-bottom: 0;
+  }
+
+  .field {
+    @include select;
+    background-color: $bgc;
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  .select {
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+  }
+}
+
+.title {
+  @include title;
+  padding-left: 1.5rem;
+  padding-top: 1.5rem;
+}
+
+.textarea {
+  outline: grey;
+}
+
+.label {
+  width: 100%;
+  font-weight: bold;
+  font-size: 1em;
+  font-style: roboto;
+  letter-spacing: -0.003em;
+  margin-top: 1rem;
+  line-height: 1.5rem;
+  color: rgb(66, 82, 110);
+  overflow-wrap: break-word;
+  text-align: left;
+  padding-bottom: 0;
+}
+
+.breadcrums {
+  padding-left: 4rem;
+}
+
+.auth-form{
+margin-top: 4rem;
+color:black;
+}
