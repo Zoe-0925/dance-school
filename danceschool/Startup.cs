@@ -183,6 +183,7 @@ namespace danceschool
 
             app.UseRequestValidator();//Check if the request header's authentication token is present
                                       // app.UseHttpsRedirection();
+            app.UseApiExceptionHandling();
             app.UseStaticFiles();
             app.UseSpaStaticFiles(new StaticFileOptions { RequestPath = "/danceschool/Client/build" });
 
