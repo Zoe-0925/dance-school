@@ -3,17 +3,18 @@ using System.Threading.Tasks;
 using MediatR;
 using danceschool.Models;
 using danceschool.Context;
+using danceschool.Api;
 
 namespace danceschool.Handlers.CommandHandlers
 {
-    public class RegisterInstructorCommand : IRequest<int>
+    public class RegisterInstructorCommand : IRequest<BaseResponse<int>>
     {
 
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
-      
-        public class RegisterInstructorCommandHandler : IRequestHandler<RegisterInstructorCommand, int>
+
+        public class RegisterInstructorCommandHandler : IRequestHandler<RegisterInstructorCommand, BaseResponse<int>>
         {
             private readonly ApplicationContext _context;
 
@@ -21,7 +22,7 @@ namespace danceschool.Handlers.CommandHandlers
             {
                 _context = context;
             }
-            public async Task<int> Handle(RegisterInstructorCommand request, CancellationToken cancellationToken)
+            public async Task<BaseResponse<int>> Handle(RegisterInstructorCommand request, CancellationToken cancellationToken)
             {
                 var instructor = new Instructor();
                 instructor.FirstName = request.FirstName;
@@ -29,10 +30,10 @@ namespace danceschool.Handlers.CommandHandlers
                 instructor.Email = request.Email;
 
                 _context.Instructor.Add(instructor);
-    
+
                 int flag = await _context.SaveChangesAsync();
                 int id = instructor.ID;
-                return id;
+                return new BaseResponse<int>(id);
             }
         }
     }

@@ -13,14 +13,10 @@ namespace danceschool.Helpers
             decoded.Claims.TryGetValue("admin", out isAdmin);
             object isStudent;
             decoded.Claims.TryGetValue("student", out isStudent);
-            if (isAdmin != null){
-                Console.WriteLine("Role: admin");
+            if (isAdmin != null)
                 return "admin";
-          }
-           else{
-                Console.WriteLine("Role: student");
+            else
                 return "student";
-            }
         }
     }
 }

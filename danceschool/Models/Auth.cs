@@ -15,16 +15,6 @@ namespace danceschool.Models
         public string UserName { get; set; }
     }
 
-    public class SignUpResult
-    {
-        public bool Succeeded { get; set; }
-    }
-
-    public class AuthorizationResult
-    {
-        public string Role { get; set; }
-    }
-
     public class Token
     {
         public string IdToken { get; set; }

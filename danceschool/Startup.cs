@@ -22,8 +22,7 @@ using System.Reflection;
 using danceschool.Middlewares;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.HttpOverrides;
-using System.Threading.Tasks;
-using StackExchange.Redis;
+using Serilog;
 
 namespace danceschool
 {
@@ -84,7 +83,7 @@ namespace danceschool
 
             services.AddSwaggerGen(c =>
                    {
-                       c.SwaggerDoc("v1", new OpenApiInfo { Title = "test", Version = "v1" });
+                       c.SwaggerDoc("v1", new OpenApiInfo { Title = "Dance School", Version = "v1" });
                    });
 
             services.AddSwaggerGen(c =>
@@ -150,6 +149,8 @@ namespace danceschool
             .AllowAnyMethod()
             .AllowAnyHeader());
 
+            app.UseSerilogRequestLogging();
+
             app.UseMvc();
             app.UseSpa(spa =>
             {
@@ -164,13 +165,10 @@ namespace danceschool
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                /**
-                c =>
+                app.UseSwagger(c =>
                 {
                     c.RouteTemplate = "danceschool/swagger/{documentName}/swagger.json";
-                }**/
-
+                });
 
                 /**  app.UseSwaggerUI(c =>
                   {

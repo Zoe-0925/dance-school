@@ -14,6 +14,7 @@ using danceschool.Models;
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
 using System;
+using Serilog;
 
 namespace danceschool.Controllers
 {
@@ -36,8 +37,8 @@ namespace danceschool.Controllers
             cachedDataString = await DistributedCache.GetStringAsync("_instrutcors");
             if (!string.IsNullOrEmpty(cachedDataString))
             {
-                // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<IEnumerable<Instructor>>(cachedDataString);
+                Log.Information($"Successfully found cached instructors.");
                 return Ok(new BaseResponse<IEnumerable<Instructor>>(data, true)); // IsCached = true
             }
             else
@@ -53,6 +54,7 @@ namespace danceschool.Controllers
                     SlidingExpiration = TimeSpan.FromSeconds(300)
                 };
                 await DistributedCache.SetStringAsync("_instructors", cachedDataString);
+                Log.Information($"Successfully found the instructors and saved to cache.");
                 return Ok(baseResponse); // IsCached = false
             }
         }
@@ -64,22 +66,19 @@ namespace danceschool.Controllers
         [HttpGet("search/{Query}")]
         public async Task<IActionResult> SearchInstructorByName(string Query)
         {
-            
+
             IEnumerable<Instructor> data = new List<Instructor>();
             string cachedDataString = string.Empty;
             cachedDataString = await DistributedCache.GetStringAsync("_instructors_search_" + Query);
             if (!string.IsNullOrEmpty(cachedDataString))
             {
-                // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<IEnumerable<Instructor>>(cachedDataString);
+                Log.Information($"Successfully found cached instructors of name:{Query}.");
                 return Ok(new BaseResponse<IEnumerable<Instructor>>(data, true)); // IsCached = true
             }
             else
             {
-                BaseResponse<IEnumerable<Instructor>> baseResponse = (BaseResponse<IEnumerable<Instructor>>)await Mediator.Send(new GetInstructorByNameQuery { Query = Query });
-
-                // loading from code (in real-time from database)
-                // then saving to the redis cache 
+                var baseResponse = await Mediator.Send(new GetInstructorByNameQuery { Query = Query });
                 data = baseResponse.Data;
                 cachedDataString = JsonSerializer.Serialize<IEnumerable<Instructor>>(baseResponse.Data);
                 var expiryOptions = new DistributedCacheEntryOptions()
@@ -88,6 +87,7 @@ namespace danceschool.Controllers
                     SlidingExpiration = TimeSpan.FromSeconds(300)
                 };
                 await DistributedCache.SetStringAsync("_instructors_search_" + Query, cachedDataString);
+                Log.Information($"Successfully found the instructors of name:{Query} and saved to cache.");
                 return Ok(baseResponse); // IsCached = false
             }
         }
@@ -104,7 +104,14 @@ namespace danceschool.Controllers
         {
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
-            return role == "admin" ? Ok(await Mediator.Send(command)) : StatusCode(401, new { Error = "Unauthorized" });
+            if (role != "admin")
+            {
+                Log.Error("Failed to create the instructor. 401 Error. Unauthorized in Instructor Controller: RegisterInstructor()");
+                return StatusCode(401, new { Error = "Unauthorized" });
+            }
+            var result = await Mediator.Send(command);
+            Log.Information($"Successfully created the instructor of id:{result.Data}.");
+            return Ok(result);
         }
 
         /// <summary>
@@ -121,11 +128,17 @@ namespace danceschool.Controllers
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
+            {
+                Log.Error("Failed to update the instructor. 401 Error. Unauthorized.");
                 return StatusCode(401, new { Error = "Unauthorized" });
-
-            BaseResponse<int> result = (BaseResponse<int>)await Mediator.Send(command);
-
-            return !result.Success ? StatusCode(result.Error.StatusCode, result.Error) : Ok(result);
+            }
+            var result = await Mediator.Send(command);
+            if (!result.Success)
+            {
+                Log.Error($"Failed to update the instructor. {result.Error.StatusCode} Error. {result.Error} in Instructor Controller: UpdateInstructor()");
+                return StatusCode(result.Error.StatusCode, result.Error);
+            }
+            return Ok(result);
         }
 
         /// <summary>
@@ -142,11 +155,18 @@ namespace danceschool.Controllers
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
+            {
+                Log.Error("Failed to delete the instructor. 401 Error. Unauthorized.");
                 return StatusCode(401, new { Error = "Unauthorized" });
-
-            BaseResponse<int> result = (BaseResponse<int>)await Mediator.Send(new UnregisterInstructorCommand { Id = id });
-
-            return !result.Success ? StatusCode(result.Error.StatusCode, result.Error) : Ok(result);
+            }
+            var result = await Mediator.Send(new UnregisterInstructorCommand { Id = id });
+            if (!result.Success)
+            {
+                Log.Error($"Failed to delete the instructor. {result.Error.StatusCode} Error. {result.Error}.");
+                return StatusCode(result.Error.StatusCode, result.Error);
+            }
+            Log.Information($"Successfully deleted the instructor of id:{id}.");
+            return Ok(result);
         }
     }
 }

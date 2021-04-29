@@ -9,6 +9,7 @@ using danceschool.Helpers;
 using danceschool.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
+using Serilog;
 using HttpDeleteAttribute = Microsoft.AspNetCore.Mvc.HttpDeleteAttribute;
 using HttpGetAttribute = Microsoft.AspNetCore.Mvc.HttpGetAttribute;
 using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
@@ -39,11 +40,12 @@ namespace danceschool.Controllers
             {
                 // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<IEnumerable<Membership>>(cachedDataString);
+                Log.Information($"Successfully got the cached membership.");
                 return Ok(new BaseResponse<IEnumerable<Membership>>(data, true)); // IsCached = true
             }
             else
             {
-                BaseResponse<IEnumerable<Membership>> baseResponse = await Mediator.Send(new GetMembershipQuery());
+                var baseResponse = await Mediator.Send(new GetMembershipQuery());
                 // loading from code (in real-time from database)
                 // then saving to the redis cache 
                 data = baseResponse.Data;
@@ -54,6 +56,7 @@ namespace danceschool.Controllers
                     SlidingExpiration = TimeSpan.FromSeconds(300)
                 };
                 await DistributedCache.SetStringAsync("_memberships", cachedDataString);
+                Log.Information($"Successfully got the membership and saved to cache.");
                 return Ok(baseResponse); // IsCached = false
             }
         }
@@ -67,8 +70,14 @@ namespace danceschool.Controllers
         {
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
-
-            return role == "admin" ? Ok(await Mediator.Send(command)) : StatusCode(401, new { Error = "Unauthorized" });
+            if (role != "admin")
+            {
+                Log.Error("401 Error. Unauthorized in Membership Controller: UpdateMembership");
+                return StatusCode(401, new { Error = "Unauthorized" });
+            }
+            var result = await Mediator.Send(command);
+            Log.Information($"Successfully created the membership of id:{result.Data}.");
+            return Ok(result);
         }
 
         /// <summary>
@@ -84,11 +93,19 @@ namespace danceschool.Controllers
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
+            {
+                Log.Error("401 Error. Unauthorized in Membership Controller: UpdateMembership");
                 return StatusCode(401, new { Error = "Unauthorized" });
+            }
+            var result = await Mediator.Send(command);
 
-            BaseResponse<int> result = (BaseResponse<int>)await Mediator.Send(command);
-
-            return !result.Success ? StatusCode(result.Error.StatusCode, result.Error) : Ok(result);
+            if (!result.Success)
+            {
+                Log.Error($"{result.Error.StatusCode} Error. {result.Error} in Membership Controller: UpdateMembership()");
+                return StatusCode(result.Error.StatusCode, result.Error);
+            }
+            Log.Information($"Successfully updated the membership of id:{command.Id}.");
+            return Ok(result);
         }
 
         /// <summary>
@@ -105,11 +122,19 @@ namespace danceschool.Controllers
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
+            {
+                Log.Error("401 Error. Unauthorized in Membership Controller: DeleteMembership");
                 return StatusCode(401, new { Error = "Unauthorized" });
+            }
+            var result = await Mediator.Send(new DeleteMembershipCommand { Id = id });
 
-            BaseResponse<int> result = (BaseResponse<int>)await Mediator.Send(new DeleteMembershipCommand { Id = id });
-
-            return !result.Success ? StatusCode(result.Error.StatusCode, result.Error) : Ok(result);
+            if (!result.Success)
+            {
+                Log.Error($"{result.Error.StatusCode} Error. {result.Error} in Membership Controller: DeleteMembership()");
+                return StatusCode(result.Error.StatusCode, result.Error);
+            }
+            Log.Information($"Successfully deleted the membership of id:{id}.");
+            return Ok(result);
         }
     }
 }

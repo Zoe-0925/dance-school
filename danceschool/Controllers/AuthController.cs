@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using danceschool.Helpers;
 using danceschool.Api;
 using danceschool.Handlers.CommandHandlers;
+using Serilog;
 
 namespace danceschool.Controllers
 {
@@ -34,29 +35,27 @@ namespace danceschool.Controllers
                     DisplayName = request.UserName,
                     Disabled = false,
                 };
-                Console.WriteLine("request.email", request.Email);
 
                 var claims = new Dictionary<string, object>()
                  {
                      { "student", true }
                  };
 
+                Log.Information("Sign up(1/2): Created a new student-role Firebase user.");
                 UserRecord userRecord = await FirebaseAuth.DefaultInstance.CreateUserAsync(args);
                 await FirebaseAuth.DefaultInstance.SetCustomUserClaimsAsync(userRecord.Uid, claims);
-                var token = await FirebaseAuth.DefaultInstance.CreateCustomTokenAsync(userRecord.Uid);
-
                 BaseResponse<int> result = (BaseResponse<int>)await Mediator.Send(new RegisterStudentCommand { UserName = request.UserName, Email = request.Email });
-
-                return Ok(new SignUpResult()
-                {
-                    Succeeded = true
-                });
+                Log.Information("Sign up(2/2): completed.");
+                return Ok(new { Successful = true }); // IsCached = false
             }
             catch (Exception e)
             {
+                Log.Error($"401 Error in Auth Controller: SignUp(). {e.Message}");
                 return StatusCode(401, new { Error = e.Message });
             }
         }
+
+
 
         /// <summary>
         /// Verify the ID token from the client
@@ -68,7 +67,6 @@ namespace danceschool.Controllers
         {
             try
             {
-                
                 string role = await AuthHelper.GetRoleFromTokenAsync(idToken.IdToken);
                 return Ok(role);
             }
@@ -76,15 +74,24 @@ namespace danceschool.Controllers
             {
                 Console.WriteLine(ex);
                 if (ex.AuthErrorCode == AuthErrorCode.ExpiredIdToken)
+                {
+                    Log.Error("401 Error in Auth Controller: SignUp(). ID token has expired");
                     return StatusCode(401, new { Error = "ID token has expired" });
+                }
                 else if (ex.AuthErrorCode == AuthErrorCode.InvalidIdToken)
+                {
+                    Log.Error("401 Error in Auth Controller: SignUp(). ID token is malformed or invalid");
                     return StatusCode(401, new { Error = "ID token is malformed or invalid" });
+                }
                 else
+                {
+                    Log.Error("401 Error in Auth Controller: SignUp(). Failed to verify ID token.");
                     return StatusCode(400, new { Error = "Failed to verify ID token." });
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Log.Error($"500 Error in Auth Controller: VerifyToken(). {ex.Message}");
                 return StatusCode(500, ex);
             }
         }

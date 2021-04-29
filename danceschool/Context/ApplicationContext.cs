@@ -16,7 +16,7 @@ namespace danceschool.Context
         public DbSet<Subscription> Subscription { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
-           => options.UseSqlServer("<Your Azure SQL Connection String>");
+           => options.UseSqlServer("Server=tcp:danceschoolserver.database.windows.net,1433;Initial Catalog=danceschooldb;Persist Security Info=False;User ID=serveradmin;Password=#8qp4MsuNeGswFz;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
 
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options)

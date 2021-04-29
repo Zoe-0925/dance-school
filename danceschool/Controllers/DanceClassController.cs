@@ -15,6 +15,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using System.Collections.Generic;
 using System;
 using danceschool.Models;
+using Serilog;
 
 namespace danceschool.Controllers
 {
@@ -45,7 +46,7 @@ namespace danceschool.Controllers
             }
             else
             {
-                var baseResponse = await Mediator.Send(new GetClassesByCourseQuery { Id = id, PageNumber = validFilter.PageNumber, PageSize = validFilter.PageSize, Upcoming=Upcoming });
+                var baseResponse = await Mediator.Send(new GetClassesByCourseQuery { Id = id, PageNumber = validFilter.PageNumber, PageSize = validFilter.PageSize, Upcoming = Upcoming });
                 // loading from code (in real-time from database)
                 // then saving to the redis cache 
                 data = baseResponse.Data;
@@ -73,11 +74,13 @@ namespace danceschool.Controllers
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
+            {
+                Log.Error("401 Error. Unauthorized in DanceClass Controller: CreateClass()");
                 return StatusCode(401, new { Error = "Unauthorized" });
-
-            BaseResponse<int> result = (BaseResponse<int>)await Mediator.Send(command);
-
-            return !result.Success ? StatusCode(result.Error.StatusCode, result.Error) : Ok(result);
+            }
+            var result = await Mediator.Send(command);
+            Log.Information($"Successfully created the dance class of id:{result.Data}.");
+            return Ok(result);
         }
 
         /// <summary>
@@ -94,11 +97,18 @@ namespace danceschool.Controllers
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
+            {
+                Log.Error("401 Error. Unauthorized in DanceClass Controller: UpdateClass()");
                 return StatusCode(401, new { Error = "Unauthorized" });
-
-            BaseResponse<int> result = (BaseResponse<int>)await Mediator.Send(command);
-
-            return !result.Success ? StatusCode(result.Error.StatusCode, result.Error) : Ok(result);
+            }
+            var result = await Mediator.Send(command);
+            if (result.Success)
+            {
+                Log.Information($"Successfully updated the course of id: {command.Id}");
+                return Ok(result);
+            }
+            Log.Error($"{result.Error.StatusCode} Error. {result.Error} in Course Controller: Delete()");
+            return StatusCode(result.Error.StatusCode, result.Error);
         }
 
         /// <summary>
@@ -115,11 +125,25 @@ namespace danceschool.Controllers
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
+            {
+                Log.Error("401 Error. Unauthorized in DanceClass Controller: Delete()");
                 return StatusCode(401, new { Error = "Unauthorized" });
-
-            BaseResponse<int> result = (BaseResponse<int>)await Mediator.Send(new DeleteClassCommand { Id = id });
-
-            return !result.Success ? StatusCode(result.Error.StatusCode, result.Error) : Ok(result);
+            }
+            try
+            {
+                var result = await Mediator.Send(new DeleteClassCommand { Id = id });
+                if (!result.Success)
+                {
+                    Log.Error($"{result.Error.StatusCode} Error. {result.Error} in Instructor Controller: UnregisterInstructor()");
+                    return StatusCode(result.Error.StatusCode, result.Error);
+                }
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Database delete Error. {e} in DanceClass Controller");
+                return StatusCode(500, e);
+            }
         }
     }
 }

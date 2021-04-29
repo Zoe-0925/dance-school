@@ -10,6 +10,7 @@ using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 using danceschool.Models;
 using System;
 using System.Collections.Generic;
+using Serilog;
 
 namespace danceschool.Controllers
 {
@@ -32,19 +33,24 @@ namespace danceschool.Controllers
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
+            {
+                Log.Error("401 Error. Unauthorized in Analytical Controller: Get()");
                 return StatusCode(401, new { Error = "Unauthorized" });
-
+            }
+            Log.Information("Getting dashboard for Admin.");
             Dashboard data = new Dashboard();
             string cachedDataString = string.Empty;
             cachedDataString = await DistributedCache.GetStringAsync("_dashboard");
             if (!string.IsNullOrEmpty(cachedDataString))
             {
+                Log.Information("Returned cached results.");
                 // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<Dashboard>(cachedDataString);
                 return Ok(new BaseResponse<Dashboard>(data, true)); // IsCached = true
             }
             else
             {
+                Log.Information("Cached new results.");
                 BaseResponse<Dashboard> baseResponse = await Mediator.Send(new GetDashboardQuery());
                 // loading from code (in real-time from database)
                 // then saving to the redis cache 
@@ -70,19 +76,25 @@ namespace danceschool.Controllers
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
+            {
+                Log.Error("401 Error. Unauthorized in Analytical Controller: Get()");
                 return StatusCode(401, new { Error = "Unauthorized" });
+            }
 
+            Log.Information("Getting Booking Count By Year for Admin.");
             IEnumerable<CountByDateNumber> data = new List<CountByDateNumber>();
             string cachedDataString = string.Empty;
             cachedDataString = await DistributedCache.GetStringAsync("_count_by_year");
             if (!string.IsNullOrEmpty(cachedDataString))
             {
+                Log.Information("Returned cached results.");
                 // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<IEnumerable<CountByDateNumber>>(cachedDataString);
                 return Ok(new BaseResponse<IEnumerable<CountByDateNumber>>(data, true)); // IsCached = true
             }
             else
             {
+                Log.Information("Cached new results.");
                 var baseResponse = await Mediator.Send(new GetBookingCountByYearQuery());
                 // loading from code (in real-time from database)
                 // then saving to the redis cache 
@@ -108,24 +120,33 @@ namespace danceschool.Controllers
         public async Task<IActionResult> GetBookingCountByDateNumber(string type)
         {
             if (type != "year" && type != "month")
+            {
+                Log.Error($"400 Error. Invalid parameter @type {type} in Analytical Controller: Get()");
                 return StatusCode(400, new { Error = "Invalid type." });
+            }
 
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
+            {
+                Log.Error("401 Error. Unauthorized in Analytical Controller: Get()");
                 return StatusCode(401, new { Error = "Unauthorized" });
+            }
+            Log.Information("Getting Booking Count By Date for Admin");
 
             IEnumerable<CountByDateNumber> data = new List<CountByDateNumber>();
             string cachedDataString = string.Empty;
             cachedDataString = await DistributedCache.GetStringAsync("_count_by_month");
             if (!string.IsNullOrEmpty(cachedDataString))
             {
+                Log.Information("Returned cached results.");
                 // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<IEnumerable<CountByDateNumber>>(cachedDataString);
                 return Ok(new BaseResponse<IEnumerable<CountByDateNumber>>(data, true)); // IsCached = true
             }
             else
             {
+                Log.Information("Cached new results.");
                 var baseResponse = await Mediator.Send(new GetBookingCountByDateNumberQuery());
                 // loading from code (in real-time from database)
                 // then saving to the redis cache 

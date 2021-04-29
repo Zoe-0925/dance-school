@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace danceschool.Controllers
 {
@@ -27,6 +28,7 @@ namespace danceschool.Controllers
         public async Task<IActionResult> ClearCache(string key)
         {
             await _distributedCache.RemoveAsync(key);
+            Log.Information($"cleared cache for key -{key}");
             return Ok(new { Message = $"cleared cache for key -{key}" });
         }
     }

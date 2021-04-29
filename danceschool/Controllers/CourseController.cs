@@ -15,6 +15,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using System.Collections.Generic;
 using danceschool.Models;
 using System;
+using Serilog;
 
 namespace danceschool.Controllers
 {
@@ -42,6 +43,7 @@ namespace danceschool.Controllers
             {
                 // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<IEnumerable<CourseDTO>>(cachedDataString);
+                Log.Information("Successfully found cache results of courses.");
                 return Ok(new BaseResponse<IEnumerable<CourseDTO>>(data, true)); // IsCached = true
             }
             else
@@ -57,6 +59,7 @@ namespace danceschool.Controllers
                     SlidingExpiration = TimeSpan.FromSeconds(300)
                 };
                 await DistributedCache.SetStringAsync("_courses_" + validFilter.PageNumber, cachedDataString);
+                Log.Information("Successfully found courses and saved to cache.");
                 return Ok(baseResponse); // IsCached = false
             }
         }
@@ -79,6 +82,7 @@ namespace danceschool.Controllers
             {
                 // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<CourseWithCountDTO>(cachedDataString);
+                Log.Information("Successfully found cache results of course with count.");
                 return Ok(new BaseResponse<CourseWithCountDTO>(data, true)); // IsCached = true
             }
             else
@@ -94,6 +98,7 @@ namespace danceschool.Controllers
                     SlidingExpiration = TimeSpan.FromSeconds(300)
                 };
                 await DistributedCache.SetStringAsync("_courses_with_count_" + validFilter.PageNumber, cachedDataString);
+                Log.Information("Successfully found courses with count and saved to cache.");
                 return Ok(baseResponse); // IsCached = false
             }
         }
@@ -105,12 +110,6 @@ namespace danceschool.Controllers
         [HttpGet("search/{Query}")]
         public async Task<IActionResult> SearchCourseByName(string Query)
         {
-
-            Request.Headers.TryGetValue("Authorization", out var token);
-            string role = await AuthHelper.GetRoleFromTokenAsync(token);
-            if (role != "admin")
-                return StatusCode(401, new { Error = "Unauthorized" });
-
             IEnumerable<CourseDTO> data = new List<CourseDTO>();
             string cachedDataString = string.Empty;
             cachedDataString = await DistributedCache.GetStringAsync("_courses_search_" + Query);
@@ -118,6 +117,7 @@ namespace danceschool.Controllers
             {
                 // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<IEnumerable<CourseDTO>>(cachedDataString);
+                Log.Information("Successfully found cache results of course by name.");
                 return Ok(new BaseResponse<IEnumerable<CourseDTO>>(data, true)); // IsCached = true
             }
             else
@@ -133,6 +133,7 @@ namespace danceschool.Controllers
                     SlidingExpiration = TimeSpan.FromSeconds(300)
                 };
                 await DistributedCache.SetStringAsync("_courses_search_" + Query, cachedDataString);
+                Log.Information("Successfully found the course by name and saved to cache");
                 return Ok(baseResponse); // IsCached = false
             }
         }
@@ -147,16 +148,16 @@ namespace danceschool.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateCourse(CreateCourseCommand command)
         {
-
-
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
+            {
+                Log.Error($"Failed to create the course. 401 Error. Unauthorized.");
                 return StatusCode(401, new { Error = "Unauthorized" });
-
-            BaseResponse<int> result = (BaseResponse<int>)await Mediator.Send(command);
-
-            return !result.Success ? StatusCode(result.Error.StatusCode, result.Error) : Ok(result);
+            }
+            var result = await Mediator.Send(command);
+            Log.Information($"Successfully created the course of id:{result.Data}.");
+            return Ok(result);
         }
 
         /// <summary>
@@ -170,16 +171,21 @@ namespace danceschool.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateCourse(UpdateCourseCommand command)
         {
-
-
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
+            {
+                Log.Error($"Failed to update the course of id: {command.Id}. 401 Error. Unauthorized.");
                 return StatusCode(401, new { Error = "Unauthorized" });
-
-            BaseResponse<int> result = (BaseResponse<int>)await Mediator.Send(command);
-
-            return !result.Success ? StatusCode(result.Error.StatusCode, result.Error) : Ok(result);
+            }
+            var result = await Mediator.Send(command);
+            if (result.Success)
+            {
+                Log.Information($"Successfully updated the course of id: {command.Id}");
+                return Ok(result);
+            }
+            Log.Error($"Failed to update the course of id: {command.Id}. {result.Error.StatusCode} Error. {result.Error} in Course Controller: Delete()");
+            return StatusCode(result.Error.StatusCode, result.Error);
         }
 
         /// <summary>
@@ -193,16 +199,21 @@ namespace danceschool.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-
-
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
+            {
+                Log.Error($"Failed to delete the course of id: {id}. 401 Error. Unauthorized.");
                 return StatusCode(401, new { Error = "Unauthorized" });
-
-            BaseResponse<int> result = (BaseResponse<int>)await Mediator.Send(new DeleteCourseCommand { Id = id });
-
-            return !result.Success ? StatusCode(result.Error.StatusCode, result.Error) : Ok(result);
+            }
+            var result = await Mediator.Send(new DeleteCourseCommand { Id = id });
+            if (!result.Success)
+            {
+                Log.Error($"Failed to delete the course of id: {id}. {result.Error.StatusCode} Error. {result.Error}.");
+                return StatusCode(result.Error.StatusCode, result.Error);
+            }
+            Log.Information($"Successfully deleted the course of id: {id}");
+            return Ok(result);
         }
     }
 }
