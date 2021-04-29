@@ -43,7 +43,10 @@ namespace danceschool.Controllers
             {
                 // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<IEnumerable<CourseDTO>>(cachedDataString);
+<<<<<<< HEAD
                 Log.Information("Successfully found cache results of courses.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return Ok(new BaseResponse<IEnumerable<CourseDTO>>(data, true)); // IsCached = true
             }
             else
@@ -59,7 +62,10 @@ namespace danceschool.Controllers
                     SlidingExpiration = TimeSpan.FromSeconds(300)
                 };
                 await DistributedCache.SetStringAsync("_courses_" + validFilter.PageNumber, cachedDataString);
+<<<<<<< HEAD
                 Log.Information("Successfully found courses and saved to cache.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return Ok(baseResponse); // IsCached = false
             }
         }
@@ -82,7 +88,10 @@ namespace danceschool.Controllers
             {
                 // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<CourseWithCountDTO>(cachedDataString);
+<<<<<<< HEAD
                 Log.Information("Successfully found cache results of course with count.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return Ok(new BaseResponse<CourseWithCountDTO>(data, true)); // IsCached = true
             }
             else
@@ -98,7 +107,10 @@ namespace danceschool.Controllers
                     SlidingExpiration = TimeSpan.FromSeconds(300)
                 };
                 await DistributedCache.SetStringAsync("_courses_with_count_" + validFilter.PageNumber, cachedDataString);
+<<<<<<< HEAD
                 Log.Information("Successfully found courses with count and saved to cache.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return Ok(baseResponse); // IsCached = false
             }
         }
@@ -110,6 +122,18 @@ namespace danceschool.Controllers
         [HttpGet("search/{Query}")]
         public async Task<IActionResult> SearchCourseByName(string Query)
         {
+<<<<<<< HEAD
+=======
+
+            Request.Headers.TryGetValue("Authorization", out var token);
+            string role = await AuthHelper.GetRoleFromTokenAsync(token);
+            if (role != "admin")
+            {
+                Log.Error("401 Error. Unauthorized in Course Controller: SearchCourseByName()");
+                return StatusCode(401, new { Error = "Unauthorized" });
+            }
+
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
             IEnumerable<CourseDTO> data = new List<CourseDTO>();
             string cachedDataString = string.Empty;
             cachedDataString = await DistributedCache.GetStringAsync("_courses_search_" + Query);
@@ -117,7 +141,10 @@ namespace danceschool.Controllers
             {
                 // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<IEnumerable<CourseDTO>>(cachedDataString);
+<<<<<<< HEAD
                 Log.Information("Successfully found cache results of course by name.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return Ok(new BaseResponse<IEnumerable<CourseDTO>>(data, true)); // IsCached = true
             }
             else
@@ -133,7 +160,10 @@ namespace danceschool.Controllers
                     SlidingExpiration = TimeSpan.FromSeconds(300)
                 };
                 await DistributedCache.SetStringAsync("_courses_search_" + Query, cachedDataString);
+<<<<<<< HEAD
                 Log.Information("Successfully found the course by name and saved to cache");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return Ok(baseResponse); // IsCached = false
             }
         }
@@ -148,16 +178,36 @@ namespace danceschool.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateCourse(CreateCourseCommand command)
         {
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
             {
+<<<<<<< HEAD
                 Log.Error($"Failed to create the course. 401 Error. Unauthorized.");
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
             var result = await Mediator.Send(command);
             Log.Information($"Successfully created the course of id:{result.Data}.");
             return Ok(result);
+=======
+                Log.Error("401 Error. Unauthorized in Course Controller: CreateCourse()");
+                return StatusCode(401, new { Error = "Unauthorized" });
+            }
+            try
+            {
+                return Ok(await Mediator.Send(command));
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Database create Error. {e} in Course Controller");
+                return StatusCode(500, e);
+            }
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
         }
 
         /// <summary>
@@ -171,10 +221,16 @@ namespace danceschool.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateCourse(UpdateCourseCommand command)
         {
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
             {
+<<<<<<< HEAD
                 Log.Error($"Failed to update the course of id: {command.Id}. 401 Error. Unauthorized.");
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
@@ -186,6 +242,20 @@ namespace danceschool.Controllers
             }
             Log.Error($"Failed to update the course of id: {command.Id}. {result.Error.StatusCode} Error. {result.Error} in Course Controller: Delete()");
             return StatusCode(result.Error.StatusCode, result.Error);
+=======
+                Log.Error("401 Error. Unauthorized in Course Controller: UpdateCourse()");
+                return StatusCode(401, new { Error = "Unauthorized" });
+            }
+            try
+            {
+                return Ok(await Mediator.Send(command));
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Database update Error. {e} in Course Controller");
+                return StatusCode(500, e);
+            }
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
         }
 
         /// <summary>
@@ -199,10 +269,16 @@ namespace danceschool.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
             {
+<<<<<<< HEAD
                 Log.Error($"Failed to delete the course of id: {id}. 401 Error. Unauthorized.");
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
@@ -214,6 +290,26 @@ namespace danceschool.Controllers
             }
             Log.Information($"Successfully deleted the course of id: {id}");
             return Ok(result);
+=======
+                Log.Error("401 Error. Unauthorized in Course Controller: Delete()");
+                return StatusCode(401, new { Error = "Unauthorized" });
+            }
+            try
+            {
+                var result = await Mediator.Send(new DeleteCourseCommand { Id = id });
+                if (!result.Success)
+                {
+                    Log.Error($"{result.Error.StatusCode} Error. {result.Error} in Course Controller: Delete()");
+                    return StatusCode(result.Error.StatusCode, result.Error);
+                }
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Database delete Error. {e} in Course Controller: Delete");
+                return StatusCode(500, e);
+            }
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
         }
     }
 }

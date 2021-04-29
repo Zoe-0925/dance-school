@@ -40,12 +40,19 @@ namespace danceschool.Controllers
             {
                 // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<IEnumerable<Membership>>(cachedDataString);
+<<<<<<< HEAD
                 Log.Information($"Successfully got the cached membership.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return Ok(new BaseResponse<IEnumerable<Membership>>(data, true)); // IsCached = true
             }
             else
             {
+<<<<<<< HEAD
                 var baseResponse = await Mediator.Send(new GetMembershipQuery());
+=======
+                BaseResponse<IEnumerable<Membership>> baseResponse = await Mediator.Send(new GetMembershipQuery());
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 // loading from code (in real-time from database)
                 // then saving to the redis cache 
                 data = baseResponse.Data;
@@ -56,7 +63,10 @@ namespace danceschool.Controllers
                     SlidingExpiration = TimeSpan.FromSeconds(300)
                 };
                 await DistributedCache.SetStringAsync("_memberships", cachedDataString);
+<<<<<<< HEAD
                 Log.Information($"Successfully got the membership and saved to cache.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return Ok(baseResponse); // IsCached = false
             }
         }
@@ -75,9 +85,13 @@ namespace danceschool.Controllers
                 Log.Error("401 Error. Unauthorized in Membership Controller: UpdateMembership");
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
+<<<<<<< HEAD
             var result = await Mediator.Send(command);
             Log.Information($"Successfully created the membership of id:{result.Data}.");
             return Ok(result);
+=======
+            return Ok(await Mediator.Send(command));
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
         }
 
         /// <summary>
@@ -97,14 +111,21 @@ namespace danceschool.Controllers
                 Log.Error("401 Error. Unauthorized in Membership Controller: UpdateMembership");
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
+<<<<<<< HEAD
             var result = await Mediator.Send(command);
+=======
+            BaseResponse<int> result = (BaseResponse<int>)await Mediator.Send(command);
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
 
             if (!result.Success)
             {
                 Log.Error($"{result.Error.StatusCode} Error. {result.Error} in Membership Controller: UpdateMembership()");
                 return StatusCode(result.Error.StatusCode, result.Error);
             }
+<<<<<<< HEAD
             Log.Information($"Successfully updated the membership of id:{command.Id}.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
             return Ok(result);
         }
 
@@ -126,14 +147,21 @@ namespace danceschool.Controllers
                 Log.Error("401 Error. Unauthorized in Membership Controller: DeleteMembership");
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
+<<<<<<< HEAD
             var result = await Mediator.Send(new DeleteMembershipCommand { Id = id });
+=======
+            BaseResponse<int> result = (BaseResponse<int>)await Mediator.Send(new DeleteMembershipCommand { Id = id });
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
 
             if (!result.Success)
             {
                 Log.Error($"{result.Error.StatusCode} Error. {result.Error} in Membership Controller: DeleteMembership()");
                 return StatusCode(result.Error.StatusCode, result.Error);
             }
+<<<<<<< HEAD
             Log.Information($"Successfully deleted the membership of id:{id}.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
             return Ok(result);
         }
     }

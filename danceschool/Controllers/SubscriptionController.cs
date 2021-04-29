@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 ﻿using System.Collections.Generic;
+=======
+﻿using System;
+using System.Collections.Generic;
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
 using System.Threading.Tasks;
 using danceschool.Api;
 using danceschool.Handlers;
@@ -34,7 +39,11 @@ namespace danceschool.Controllers
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
             {
+<<<<<<< HEAD
                 Log.Error("Failed to find subscription. 401 Error. Unauthorized in Subscription Controller: GetSubscription");
+=======
+                Log.Error("401 Error. Unauthorized in Subscription Controller: GetSubscription");
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
             var result = await Mediator.Send(new GetSubscriptionQuery { PageNumber = PageNumber, PageSize = PageSize });
@@ -44,7 +53,10 @@ namespace danceschool.Controllers
                 Log.Error($"{result.Error.StatusCode} Error. {result.Error} in Booking Controller: GetSubscription()");
                 return StatusCode(result.Error.StatusCode, result.Error);
             }
+<<<<<<< HEAD
             Log.Information($"Successfully found subscription at page: {PageNumber}.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
             return Ok(result);
         }
 
@@ -61,7 +73,11 @@ namespace danceschool.Controllers
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
             {
+<<<<<<< HEAD
                 Log.Error("Failed to find subscription by student of id: {id} at page: {PageNumber}. 401 Error. Unauthorized.");
+=======
+                Log.Error("401 Error. Unauthorized in Subscription Controller: GetStudentSubscription");
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
             BaseResponse<IEnumerable<Subscription>> result = (BaseResponse<IEnumerable<Subscription>>)await Mediator.Send(new GetSubscriptionHistoryQuery { Id = id, PageNumber = PageNumber, PageSize = PageSize });
@@ -71,7 +87,10 @@ namespace danceschool.Controllers
                 Log.Error($"{result.Error.StatusCode} Error. {result.Error} in Booking Controller: GetStudentSubscription()");
                 return StatusCode(result.Error.StatusCode, result.Error);
             }
+<<<<<<< HEAD
             Log.Information($"Successfully found subscription by student of id: {id} at page: {PageNumber}.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
             return Ok(result);
         }
 
@@ -85,6 +104,7 @@ namespace danceschool.Controllers
         [HttpPost]
         public async Task<IActionResult> Subscribe(SubscribeCommand command)
         {
+<<<<<<< HEAD
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin" || role != "student")
@@ -95,6 +115,28 @@ namespace danceschool.Controllers
             var result = await Mediator.Send(command);
             Log.Information($"Successfully created the subscription of id:{result.Data}.");
             return Ok(result);
+=======
+
+            Request.Headers.TryGetValue("Authorization", out var token);
+
+            string role = await AuthHelper.GetRoleFromTokenAsync(token);
+            Console.WriteLine("role", role);
+            if (role != "admin" || role != "student")
+            {
+                Log.Error("401 Error. Unauthorized in Subscription Controller: Subscribe");
+                return StatusCode(401, new { Error = "Unauthorized" });
+            }
+            try
+            {
+                BaseResponse<int> result = (BaseResponse<int>)await Mediator.Send(command);
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Database create Error. {e} in Booking Controller: GetStudentSubscription()");
+                return StatusCode(500, e);
+            }
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
         }
 
         /// <summary>
@@ -108,10 +150,15 @@ namespace danceschool.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateSubscription(UpdateSubscriptionCommand command)
         {
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
             Request.Headers.TryGetValue("Authorization", out var token);
 
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin" || role != "student")
+<<<<<<< HEAD
             {
                 Log.Error("Failed to update the subscription of id:{command.Id}. 401 Error. Unauthorized.");
                 return StatusCode(401, new { Error = "Unauthorized" });
@@ -123,6 +170,16 @@ namespace danceschool.Controllers
                 return StatusCode(result.Error.StatusCode, result.Error);
             }
             Log.Information($"Successfully updated the subscription of id:{command.Id}.");
+=======
+                return StatusCode(401, new { Error = "Unauthorized" });
+            BaseResponse<int> result = (BaseResponse<int>)await Mediator.Send(command);
+
+            if (!result.Success)
+            {
+                Log.Error($"{result.Error.StatusCode} Error. {result.Error} in Booking Controller: GetStudentSubscription()");
+                return StatusCode(result.Error.StatusCode, result.Error);
+            }
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
             return Ok(result);
         }
 
@@ -142,6 +199,7 @@ namespace danceschool.Controllers
 
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin" || role != "student")
+<<<<<<< HEAD
             {
                 Log.Error("Failed to delete the subscription of id: {id}. 401 Error. Unauthorized.");
                 return StatusCode(401, new { Error = "Unauthorized" });
@@ -155,6 +213,12 @@ namespace danceschool.Controllers
             }
             Log.Information($"Successfully deleted the subscription of id:{id}.");
             return Ok(result);
+=======
+                return StatusCode(401, new { Error = "Unauthorized" });
+            BaseResponse<int> result = (BaseResponse<int>)await Mediator.Send(new DeleteSubscriptionCommand { Id = id });
+
+            return !result.Success ? StatusCode(result.Error.StatusCode, result.Error) : Ok(result);
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
         }
     }
 }

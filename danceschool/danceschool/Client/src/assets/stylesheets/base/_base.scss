@@ -1,0 +1,103 @@
+// -----------------------------------------------------------------------------
+// This file contains very basic styles.
+// -----------------------------------------------------------------------------
+@import "../abstracts/variables";
+@import "../abstracts/mixins";
+
+.App {
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  padding: 0;
+}
+
+.main {
+  background-color: rgb(244, 246, 248);
+  margin-top: 3rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  //padding-right: 2%;
+
+  .bread-crumbs {
+    margin-top: 3.5rem;
+    margin-left: 2rem;
+  }
+
+  .filter-row {
+    padding-left: 2%;
+    padding-bottom: 2rem;
+  }
+}
+
+@media (min-width: 416px) {
+  .drawer-close {
+    margin-left: 16.25rem;
+  }
+}
+
+@media (max-width: 415px) {
+  .main {
+    margin-top: 3rem;
+    width: auto;
+  }
+}
+
+.cursor {
+  cursor: pointer;
+}
+
+.text-area {
+  width: $full;
+  margin: 0;
+  padding: 0;
+}
+
+.form-label {
+  @include label;
+}
+
+.navbar-create-btn {
+  @include call-to-action-button;
+}
+
+.body {
+  margin-top: 4rem;
+  background-color: white;
+}
+
+.dashboard {
+  background-color: $bgc;
+  width: 100%;
+  height: 100%;
+}
+
+.full-width {
+  width: 100%;
+  padding: 0;
+}
+
+.landing-page {
+  width: 100%; 
+  height: 100%; 
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+
+  .landing-img {
+    /* The image used */
+    background-image: url("https://images.unsplash.com/photo-1519428376293-4733053a9c4a?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=767&q=80");
+    width: 100%;
+    /* Full height */
+    height: 100%;
+
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    @media (max-width: 415px) {
+      height: 30%;
+      width: 100%;
+    }
+  }
+}

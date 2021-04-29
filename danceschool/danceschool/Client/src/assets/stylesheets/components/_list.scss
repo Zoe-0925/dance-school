@@ -1,0 +1,96 @@
+.inner-list-item {
+    margin-left: 5rem;
+    background-color: white;
+}
+
+.list-item {
+    background-color: $bgc;
+}
+
+.drop-down-list {
+    min-width: 28rem;
+}
+
+.small-table-cell {
+    width: 7rem;
+}
+
+.medium-table-cell {
+    width: 9rem;
+}
+
+.large-table-cell {
+    width: 12.5rem;
+}
+
+.item-text {
+    text-align: center;
+}
+
+@media (max-device-width: 415px) {
+    .small-table-cell {
+        width: 4rem;
+    }
+
+    .list {
+        width: 100%;
+        margin-left: 0;
+        padding-left: 0;
+    }
+
+    .medium-table-cell {
+        width: 4rem;
+    }
+
+    .large-table-cell {
+        width: 5rem;
+    }
+}
+
+@media (max-width: 415px) {
+    .item-text {
+        text-align: left;
+    }
+}
+
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 1) {
+    .small-table-cell {
+        width: 5rem;
+    }
+
+    .medium-table-cell {
+        width: 5rem;
+    }
+
+    .large-table-cell {
+        width: 7rem;
+    }
+}
+
+@media (min-device-width: 800px) and (max-device-width: 1280px) {
+    .small-table-cell {
+        width: 5rem;
+    }
+
+    .medium-table-cell {
+        width: 5rem;
+    }
+
+    .large-table-cell {
+        width: 7rem;
+    }
+}
+
+@media screen and (device-width: 360px) and (device-height: 640px) and (-webkit-device-pixel-ratio: 2) {
+    .small-table-cell {
+        width: 4rem;
+    }
+
+    .medium-table-cell {
+        width: 4rem;
+    }
+
+    .large-table-cell {
+        width: 5rem;
+    }
+}

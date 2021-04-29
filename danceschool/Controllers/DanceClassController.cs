@@ -78,9 +78,21 @@ namespace danceschool.Controllers
                 Log.Error("401 Error. Unauthorized in DanceClass Controller: CreateClass()");
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
+<<<<<<< HEAD
             var result = await Mediator.Send(command);
             Log.Information($"Successfully created the dance class of id:{result.Data}.");
             return Ok(result);
+=======
+            try
+            {
+                return Ok(await Mediator.Send(command));
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Database create Error. {e} in DanceClass Controller");
+                return StatusCode(500, e);
+            }
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
         }
 
         /// <summary>
@@ -101,6 +113,7 @@ namespace danceschool.Controllers
                 Log.Error("401 Error. Unauthorized in DanceClass Controller: UpdateClass()");
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
+<<<<<<< HEAD
             var result = await Mediator.Send(command);
             if (result.Success)
             {
@@ -109,6 +122,17 @@ namespace danceschool.Controllers
             }
             Log.Error($"{result.Error.StatusCode} Error. {result.Error} in Course Controller: Delete()");
             return StatusCode(result.Error.StatusCode, result.Error);
+=======
+            try
+            {
+                return Ok(await Mediator.Send(command));
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Database update Error. {e} in DanceClass Controller");
+                return StatusCode(500, e);
+            }
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
         }
 
         /// <summary>

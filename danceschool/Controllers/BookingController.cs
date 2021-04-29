@@ -38,18 +38,34 @@ namespace danceschool.Controllers
 
             if (role != "admin")
             {
+<<<<<<< HEAD
                 Log.Error("401 Error. Unauthorized to get bookings.");
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
             var validFilter = new PaginationFilter(PageNumber, PageSize);
+=======
+                Log.Error("401 Error. Unauthorized in Analytical Controller: Get()");
+                return StatusCode(401, new { Error = "Unauthorized" });
+            }
+
+            Log.Information("Getting all bookings.");
+            var validFilter = new PaginationFilter(PageNumber, PageSize);
+
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
             IEnumerable<BookingDTO> data = new List<BookingDTO>();
             string cachedDataString = string.Empty;
             cachedDataString = await DistributedCache.GetStringAsync("_bookings_" + validFilter.PageNumber);
             if (!string.IsNullOrEmpty(cachedDataString))
             {
+<<<<<<< HEAD
                 // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<IEnumerable<BookingDTO>>(cachedDataString);
                 Log.Information($"Successfully found cache results of booking of page {PageNumber}.");
+=======
+                Log.Information("Returned cached results.");
+                // loaded data from the redis cache.
+                data = JsonSerializer.Deserialize<IEnumerable<BookingDTO>>(cachedDataString);
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return Ok(new BaseResponse<IEnumerable<BookingDTO>>(data, true)); // IsCached = true
             }
             else
@@ -66,7 +82,10 @@ namespace danceschool.Controllers
                     SlidingExpiration = TimeSpan.FromSeconds(300)
                 };
                 await DistributedCache.SetStringAsync("_bookings_" + validFilter.PageNumber, cachedDataString);
+<<<<<<< HEAD
                 Log.Information($"Successfully found booking of page {PageNumber} and saved to cache.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return Ok(baseResponse); // IsCached = false
             }
         }
@@ -88,6 +107,10 @@ namespace danceschool.Controllers
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
             var validFilter = new PaginationFilter(PageNumber, PageSize);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
             BookingCountDTO data = new BookingCountDTO();
             string cachedDataString = string.Empty;
             cachedDataString = await DistributedCache.GetStringAsync("_bookings_with_count_" + validFilter.PageNumber);
@@ -95,7 +118,10 @@ namespace danceschool.Controllers
             {
                 // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<BookingCountDTO>(cachedDataString);
+<<<<<<< HEAD
                 Log.Information($"Successfully found cache results of booking with count of page {PageNumber}.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return Ok(new BaseResponse<BookingCountDTO>(data, true)); // IsCached = true
             }
             else
@@ -114,7 +140,10 @@ namespace danceschool.Controllers
                         SlidingExpiration = TimeSpan.FromSeconds(300)
                     };
                     await DistributedCache.SetStringAsync("_bookings_with_count_" + validFilter.PageNumber, cachedDataString);
+<<<<<<< HEAD
                     Log.Information($"Successfully found booking with count of page {PageNumber} and saved to cache.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                     return Ok(baseResponse); // IsCached = false
                 }
                 Log.Error("401 Error. Unauthorized in Booking Controller: GetWithCount()");
@@ -149,7 +178,10 @@ namespace danceschool.Controllers
             {
                 // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<IEnumerable<Booking>>(cachedDataString);
+<<<<<<< HEAD
                 Log.Information($"Successfully found cached booking by student of page {PageNumber}.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return Ok(new BaseResponse<IEnumerable<Booking>>(data, true)); // IsCached = true
             }
             else
@@ -185,7 +217,11 @@ namespace danceschool.Controllers
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "student" || role != "admin")
             {
+<<<<<<< HEAD
                 Log.Error("401 Error. Unauthorized to search booking.");
+=======
+                Log.Error("401 Error. Unauthorized in Bookinging Controller: SearchBookingByCourseName");
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
 
@@ -196,7 +232,10 @@ namespace danceschool.Controllers
             {
                 // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<IEnumerable<Booking>>(cachedDataString);
+<<<<<<< HEAD
                 Log.Information($"Successfully found cached booking by course name: {Query}.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return Ok(new BaseResponse<IEnumerable<Booking>>(data, true)); // IsCached = true
             }
             else
@@ -212,7 +251,10 @@ namespace danceschool.Controllers
                     SlidingExpiration = TimeSpan.FromSeconds(300)
                 };
                 await DistributedCache.SetStringAsync("_bookings_by_course_" + Query, cachedDataString);
+<<<<<<< HEAD
                 Log.Information($"Successfully found booking by course name: {Query} and saved to cache.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return Ok(baseResponse); // IsCached = false
             }
         }
@@ -227,10 +269,14 @@ namespace danceschool.Controllers
             Request.Headers.TryGetValue("Authorization", out var token);
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "student" || role != "admin")
+<<<<<<< HEAD
             {
                 Log.Error("401 Error. Unauthorized to search booking.");
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
+=======
+                return StatusCode(401, new { Error = "Unauthorized" });
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
 
             var validFilter = new PaginationFilter(PageNumber, PageSize);
 
@@ -262,7 +308,10 @@ namespace danceschool.Controllers
                     SlidingExpiration = TimeSpan.FromSeconds(300)
                 };
                 await DistributedCache.SetStringAsync("_bookings_by_date_from_" + StartDate + "_to_" + EndDate + "_" + validFilter.PageNumber, cachedDataString);
+<<<<<<< HEAD
                 Log.Information($"Successfully found booking by date range.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return Ok(baseResponse); // IsCached = false
             }
         }
@@ -281,12 +330,27 @@ namespace danceschool.Controllers
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin" || role != "student")
             {
+<<<<<<< HEAD
                 Log.Error($"Failed to create the booking. 401 Error. Unauthorized.");
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
             var result = await Mediator.Send(command);
             Log.Information($"Successfully created the booking of id:{result.Data}.");
             return Ok(result);
+=======
+                Log.Error($"401 Error. Unauthorized in Booking Controller: BookClass()");
+                return StatusCode(401, new { Error = "Unauthorized" });
+            }
+            try
+            {
+                return Ok(await Mediator.Send(command));
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Database create Error. {e} in Booking Controller");
+                return StatusCode(500, e);
+            }
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
         }
 
         /// <summary>
@@ -305,7 +369,11 @@ namespace danceschool.Controllers
 
             if (role != "admin" || role != "student")
             {
+<<<<<<< HEAD
                 Log.Error("Failed to delete the booking of id: {id}. 401 Error. Unauthorized in Booking Controller: Delete()");
+=======
+                Log.Error("401 Error. Unauthorized in Booking Controller: Delete()");
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
 
@@ -314,6 +382,7 @@ namespace danceschool.Controllers
                 string bookingOwner = await Mediator.Send(new GetStudentEmailByBookingIdQuery { Id = id });
                 if (bookingOwner != email)
                 {
+<<<<<<< HEAD
                     Log.Error($"Failed to delete the booking of id: {id} for student: {email}. 401 Error. Unauthorized. Students can only delete their own bookings.)");
                     return StatusCode(401, new { Error = "Unauthorized" });
                 }
@@ -326,6 +395,21 @@ namespace danceschool.Controllers
             }
             Log.Error($"{result.Error.StatusCode} Error. {result.Error.Message}");
             return StatusCode(result.Error.StatusCode, result);
+=======
+                    Log.Error("401 Error. Unauthorized in Booking Controller: Delete()");
+                    return StatusCode(401, new { Error = "Unauthorized" });
+                }
+            }
+            try
+            {
+                return Ok(await Mediator.Send(new CancelBookingCommand { Id = id }));
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Database delete Error. {e} in Booking Controller");
+                return StatusCode(500, e);
+            }
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
         }
     }
 }

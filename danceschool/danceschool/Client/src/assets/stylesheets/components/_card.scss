@@ -1,0 +1,85 @@
+.analytics-card-container {
+    margin-bottom: 1rem;
+    border-radius: 5rem;
+
+    .card-name {
+        font-size: large;
+    }
+}
+
+.card-list {
+    margin-top: 3rem;
+    margin-left: 0;
+    margin-right: 0;
+    padding-right: 2rem;
+    width: 100%;
+    height: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    grid-gap: 1rem;
+}
+
+.card-container {
+    cursor: pointer;
+
+    .card-name {
+        font-size: large;
+        font-weight: 600;
+    }
+}
+
+.card-container:hover {
+    .card-name {
+        color: purple;
+    }
+}
+
+.card-avatar {
+    height: 56px;
+    width: 56px;
+    color: green;
+    background-color: green;
+}
+
+.chart {
+    height: 25rem;
+    width: 100%;
+    margin-bottom: 1rem;
+    padding: 0;
+
+    .card-header {
+        background-color: white;
+    }
+
+    .MuiCardHeader-title {
+        font-size: 1.5rem;
+    }
+
+    .box {
+        height: 17.5rem;
+    }
+
+    .pie-box {
+        height: 16rem;
+    }
+}
+
+.MuiCardHeader-title {
+    font-size: 1rem;
+}
+
+.MuiSvgIcon-root {
+    fill: currentColor;
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    font-size: 1.5rem;
+    transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.MuiAvatar-colorDefault {
+    color: rgb(189, 91, 238);
+    background-color: rgb(189, 91, 238);
+}

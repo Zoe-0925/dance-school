@@ -39,7 +39,11 @@ namespace danceschool.Controllers
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
             {
+<<<<<<< HEAD
                 Log.Error("Failed to get students. 401 Error.");
+=======
+                Log.Error("401 Error. Unauthorized in Student Controller: Get");
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
             var validFilter = new PaginationFilter(PageNumber, PageSize);
@@ -51,7 +55,10 @@ namespace danceschool.Controllers
             {
                 // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<IEnumerable<StudentDTO>>(cachedDataString);
+<<<<<<< HEAD
                 Log.Information($"Successfully got the cached students.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return Ok(new BaseResponse<IEnumerable<StudentDTO>>(data, true)); // IsCached = true
             }
             else
@@ -69,10 +76,15 @@ namespace danceschool.Controllers
                         SlidingExpiration = TimeSpan.FromSeconds(300)
                     };
                     await DistributedCache.SetStringAsync("_students_" + validFilter.PageNumber, cachedDataString);
+<<<<<<< HEAD
                     Log.Information($"Successfully got the students and saved to cache.");
                     return Ok(baseResponse); // IsCached = false
                 }
                 Log.Error($"Failed to get students. ${baseResponse.Error.StatusCode} Error. {baseResponse.Error.Message}");
+=======
+                    return Ok(baseResponse); // IsCached = false
+                }
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return StatusCode(baseResponse.Error.StatusCode, baseResponse.Error);
             }
         }
@@ -89,9 +101,16 @@ namespace danceschool.Controllers
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
             {
+<<<<<<< HEAD
                 Log.Error("Failed to search students. 401 Error. Unauthorized.");
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
+=======
+                Log.Error("401 Error. Unauthorized in Student Controller:  SearchStudentByName");
+                return StatusCode(401, new { Error = "Unauthorized" });
+            }
+
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
             IEnumerable<StudentDTO> data = new List<StudentDTO>();
             string cachedDataString = string.Empty;
             cachedDataString = await DistributedCache.GetStringAsync("_students_search_" + Query);
@@ -99,7 +118,10 @@ namespace danceschool.Controllers
             {
                 // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<IEnumerable<StudentDTO>>(cachedDataString);
+<<<<<<< HEAD
                 Log.Information($"Successfully found the cached students of name:{Query}.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return Ok(new BaseResponse<IEnumerable<StudentDTO>>(data, true)); // IsCached = true
             }
             else
@@ -115,7 +137,10 @@ namespace danceschool.Controllers
                     SlidingExpiration = TimeSpan.FromSeconds(300)
                 };
                 await DistributedCache.SetStringAsync("_students_search_" + Query, cachedDataString);
+<<<<<<< HEAD
                 Log.Information($"Successfully found the students of name:{Query} and saved to cache.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return Ok(baseResponse); // IsCached = false
             }
         }
@@ -138,12 +163,19 @@ namespace danceschool.Controllers
             {
                 // loaded data from the redis cache.
                 data = JsonSerializer.Deserialize<StudentDTO>(cachedDataString);
+<<<<<<< HEAD
                 Log.Information($"Successfully find the cached student of email:{email}.");
+=======
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return Ok(new BaseResponse<StudentDTO>(data, true)); // IsCached = true
             }
             else
             {
                 var baseResponse = await Mediator.Send(new GetSingleStudentQuery { Email = email });
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 if (baseResponse.Success)
                 {
                     // loading from code (in real-time from database)
@@ -156,10 +188,15 @@ namespace danceschool.Controllers
                         SlidingExpiration = TimeSpan.FromSeconds(300)
                     };
                     await DistributedCache.SetStringAsync("_students_email_" + email, cachedDataString);
+<<<<<<< HEAD
                     Log.Information($"Successfully find the student of email:{email} and saved to cache.");
                     return Ok(baseResponse); // IsCached = false
                 }
                 Log.Error($"Failed to find student of email:{email}. 401 Error. Unauthorized.");
+=======
+                    return Ok(baseResponse); // IsCached = false
+                }
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
                 return StatusCode(baseResponse.Error.StatusCode, baseResponse.Error);
             }
         }
@@ -178,11 +215,24 @@ namespace danceschool.Controllers
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
             {
+<<<<<<< HEAD
                 Log.Error("Failed to create student. 401 Error. Unauthorized.");
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
             var result = await Mediator.Send(command);
             Log.Information($"Successfully created the student of id:{result.Data}.");
+=======
+                Log.Error("401 Error. Unauthorized in Student Controller: RegisterStudent");
+                return StatusCode(401, new { Error = "Unauthorized" });
+            }
+            var result = await Mediator.Send(command);
+
+            if (!result.Success)
+            {
+                Log.Error($"{result.Error.StatusCode} Error. {result.Error} in Student Controller: RegisterStudent()");
+                return StatusCode(result.Error.StatusCode, result.Error);
+            }
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
             return Ok(result);
         }
 
@@ -202,6 +252,7 @@ namespace danceschool.Controllers
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
             {
+<<<<<<< HEAD
                 Log.Error($"Failed to update the student of id:{command.Id}. 401 Error. Unauthorized.");
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
@@ -212,6 +263,18 @@ namespace danceschool.Controllers
                 return StatusCode(result.Error.StatusCode, result.Error);
             }
             Log.Information($"Successfully updated the student of id:{command.Id}.");
+=======
+                Log.Error("401 Error. Unauthorized in Student Controller: UpdateStudentUserName");
+                return StatusCode(401, new { Error = "Unauthorized" });
+            }
+            BaseResponse<int> result = (BaseResponse<int>)await Mediator.Send(command);
+
+            if (!result.Success)
+            {
+                Log.Error($"{result.Error.StatusCode} Error. {result.Error} in Student Controller: UpdateStudentUserName()");
+                return StatusCode(result.Error.StatusCode, result.Error);
+            }
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
             return Ok(result);
         }
 
@@ -231,6 +294,7 @@ namespace danceschool.Controllers
             string role = await AuthHelper.GetRoleFromTokenAsync(token);
             if (role != "admin")
             {
+<<<<<<< HEAD
                 Log.Error($"Failed to delete the student of id:{Id}. 401 Error. Unauthorized.");
                 return StatusCode(401, new { Error = "Unauthorized" });
             }
@@ -242,6 +306,18 @@ namespace danceschool.Controllers
                 return StatusCode(result.Error.StatusCode, result.Error);
             }
             Log.Information($"Successfully deleted the student of id:{Id}.");
+=======
+                Log.Error("401 Error. Unauthorized in Student Controller: UnregisterStudent");
+                return StatusCode(401, new { Error = "Unauthorized" });
+            }
+            BaseResponse<int> result = (BaseResponse<int>)await Mediator.Send(new UnregisterStudentCommand { StudentID = Id });
+
+            if (!result.Success)
+            {
+                Log.Error($"{result.Error.StatusCode} Error. {result.Error} in Student Controller: UnregisterStudent()");
+                return StatusCode(result.Error.StatusCode, result.Error);
+            }
+>>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
             return Ok(result);
         }
     }
