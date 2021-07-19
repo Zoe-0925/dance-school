@@ -71,7 +71,6 @@ The portals for instructors and registered students are coming soon. <br />
 <a name="Tech"></a>
 ## Tech Stack:
 Front End: React.js, Redux Thunk, SASS, Material-UI, Formik, Firebase Authentication <br />
-<<<<<<< HEAD
 Back End: ASP.NET Core 5.0, Entity Framework Core, SQL Server, Linq, Redis, Firebase Authentication, Azure Deployment <br />
 =======
 Back End: ASP.NET Core 5.0, Entity Framework Core, SQL Server, Linq, Redis, Firebase Authentication, Azure Deployment, Serilog <br />
