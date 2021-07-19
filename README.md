@@ -51,10 +51,7 @@ The portals for instructors and registered students are coming soon. <br />
 | Firebase Auth | Authentication and role-based authorization implemented with middlewares to filter unauthenticated requests |
 | Error handlings and Validations | Customised error response codes for business logics and fast client-side Formik validations |
 | SQL Stored Procedures | Prevent SQL injection |
-<<<<<<< HEAD
-=======
 | Structured Logging | Serilog captures errors to enhance auditing and debugging |
->>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
 
 <a name="Scalability"></a>
 ### Scalability and Performance
@@ -72,9 +69,7 @@ The portals for instructors and registered students are coming soon. <br />
 ## Tech Stack:
 Front End: React.js, Redux Thunk, SASS, Material-UI, Formik, Firebase Authentication <br />
 Back End: ASP.NET Core 5.0, Entity Framework Core, SQL Server, Linq, Redis, Firebase Authentication, Azure Deployment <br />
-=======
 Back End: ASP.NET Core 5.0, Entity Framework Core, SQL Server, Linq, Redis, Firebase Authentication, Azure Deployment, Serilog <br />
->>>>>>> 6932947c1096e40a2211381a7ba1a25ec95a0c4f
 
 <a name="Design"></a>
 ## Design Patterns:
