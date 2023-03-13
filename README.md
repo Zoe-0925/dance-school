@@ -1,4 +1,4 @@
-# Dance School Member Management System
+# Dance School - Member Management System
 ### ASP.NET Core, Entity Framework Core, SQL Server, React.js, SPA, Azure, Redis
 
 An ASP.NET core web application designed for a small business that runs a dance school. <br />
